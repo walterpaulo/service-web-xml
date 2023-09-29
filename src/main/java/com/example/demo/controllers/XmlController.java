@@ -1,16 +1,9 @@
 package com.example.demo.controllers;
 
 import java.io.File;
-import java.util.UUID;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -21,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.Util.ZipUtil;
 import com.example.demo.service.XmlService;
 
 @RestController
@@ -49,6 +43,29 @@ public class XmlController {
                 .headers(headers)
                 .contentLength(xmlBytes.length)
                 .contentType(MediaType.APPLICATION_XML)
+                .body(resource);
+    }
+
+    @GetMapping("/download-xml-zip")
+    public ResponseEntity<ByteArrayResource> downloadXMLZip() throws IOException {
+
+        List<File> listaDeArquivos = new ArrayList<>();
+
+        listaDeArquivos.add(ZipUtil.createFile("arquivo1.txt", "Conteúdo do arquivo 1"));
+        listaDeArquivos.add(ZipUtil.createFile("arquivo2.txt", "Conteúdo do arquivo 2"));
+        listaDeArquivos.add(ZipUtil.createFile(" produtos.xml", service.visualizarXML()));
+
+        byte[] zipBytes = ZipUtil.createZipBytes(listaDeArquivos);
+
+        ByteArrayResource resource = new ByteArrayResource(zipBytes);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=exemplo.zip");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(zipBytes.length)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
 
