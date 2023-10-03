@@ -16,6 +16,8 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.github.javafaker.Faker;
+
 @Service
 public class XmlService {
 
@@ -37,8 +39,23 @@ public class XmlService {
         element.appendChild(elementoNovo);
     }
 
+    public String inicialXML() throws TransformerException, ParserConfigurationException {
+        Document document = this.criarDocumento();
+
+        // elemento raiz do XML
+        Element raiz = document.createElement("projeto");
+        this.criarAtrituto(raiz, document, "versao", "1.00");
+        this.criarElemento(raiz, document, "nome", "SERVICE WEB XML");
+        document.appendChild(raiz);
+        DOMSource domSource = new DOMSource(document);
+
+        return transformDOMSourceToString(domSource);
+    }
+
     public String visualizarXML() {
         try {
+            Faker faker = new Faker();
+
             Document document = this.criarDocumento();
 
             // elemento raiz do XML
@@ -46,21 +63,19 @@ public class XmlService {
             document.appendChild(raiz);
 
             this.criarAtrituto(raiz, document, "versao", "1.00");
-            // criarAtrituto(raiz, document, "versao", "1.00");
+            for (int i = 0; i < 10; i++) {
+                Element produto = document.createElement("produto");
+                raiz.appendChild(produto);
+    
+                this.criarAtrituto(produto, document, "id", "_" + UUID.randomUUID());
+    
+                this.criarElemento(produto, document, "nome", faker.commerce().productName());
+                this.criarElemento(produto, document, "preco", faker.commerce().price(10, 50));
+                this.criarElemento(produto, document, "codigoBarra", faker.idNumber().invalid());
+                this.criarElemento(produto, document, "códigoPromocao", faker.commerce().promotionCode(10)); 
+            }
 
-            // elemento element
-            Element produto = document.createElement("produto");
-            raiz.appendChild(produto);
 
-            // definindo o atributo do element
-            this.criarAtrituto(produto, document, "id", "_" + UUID.randomUUID());
-
-            // definindo valor da elementagem na tag text
-            this.criarElemento(produto, document, "nome", "Arroz");
-            this.criarElemento(produto, document, "preco", "24.99");
-            this.criarElemento(produto, document, "codigoBarra", "78912343");
-
-            // construção do XML
             DOMSource domSource = new DOMSource(document);
 
             return transformDOMSourceToString(domSource);

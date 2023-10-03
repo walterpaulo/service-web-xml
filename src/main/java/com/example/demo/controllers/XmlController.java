@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.example.demo.Util.ZipUtil;
 import com.example.demo.service.XmlService;
@@ -25,8 +30,12 @@ public class XmlController {
     private XmlService service;
 
     @GetMapping(produces = MediaType.APPLICATION_XML_VALUE, path = "/")
-    public String index() {
-        
+    public String index() throws ParserConfigurationException, TransformerException {
+        return service.inicialXML();
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_XML_VALUE, path = "/produtos")
+    public String produtos() throws ParserConfigurationException, TransformerException {
         return service.visualizarXML();
     }
 
